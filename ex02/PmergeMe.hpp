@@ -4,6 +4,7 @@
 # include <string>
 # include <vector>
 # include <list>
+# include <limits.h>
 
 class PmergeMe
 {
@@ -14,9 +15,13 @@ class PmergeMe
         std::vector<int> v;
         std::list<int> l;
         for (int i = 1; i < ac; i++) {
-            int val = atoi(av[i]);
+            long val = atol(av[i]);
+            if (std::string(av[i]).length() > 10)
+                throw Exception("Error: number too long, do not test me...");
             if (val <= 0)
-                throw Exception("Error: Input sequence must only contain positive integers.");
+                throw Exception("Error: encoutered non positive integers, do not test me...");
+            if (val > INT_MAX)
+                throw Exception("Error: encoutered integer bigger than INT_MAX,do not test me...");
             v.push_back(val);
             l.push_back(val);
         }
