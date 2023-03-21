@@ -3,6 +3,7 @@
 # include <iostream>
 # include <string>
 # include <stack>
+# include <cstdlib>
 
 class RPN
 {
@@ -14,32 +15,30 @@ class RPN
     RPN() : stack() { }
     RPN(char **expression) : stack()
     {
-        for (; expression; expression++)
+        for (int exp_i = 0; expression[exp_i] != NULL; exp_i++)
         {
-            char *arg = *expression;
+            char *arg = expression[exp_i];
             if (is_number(arg))
                 stack.push(atof(arg));
             else if (is_op(arg))
             {
                 float second_nb = get_last_nb();
                 float first_nb = get_last_nb();
-                float res;
                 switch (*arg)
                 {
                 case '+':
-                    res = first_nb + second_nb;
+                    stack.push(first_nb + second_nb);
                     break;
                 case '-':
-                    res = first_nb - second_nb;
+                    stack.push(first_nb - second_nb);
                     break;
                 case '/':
-                    res = first_nb / second_nb;
+                    stack.push(first_nb / second_nb);
                     break;
                 case '*':
-                    res = first_nb * second_nb;
+                    stack.push(first_nb * second_nb);
                     break;
                 }
-                stack.push(res);
             }
             else
                 throw RPNException();
@@ -55,6 +54,7 @@ class RPN
     //operator overloads
     RPN& operator=(const RPN& rhs)
     {
+        (void)rhs;
         return *this;
     }
     //methods
@@ -68,9 +68,14 @@ class RPN
     }
     bool is_number(char *arg)
     {
-        if (arg[0] == '+' || arg[0] == '-')
-            arg++;
-        return isdigit(arg[0]) && isdigit(arg[1]) && arg[2] == 0;
+        arg += arg[0] == '+' || arg[0] == '-';
+        int i = 0;
+        for(; arg[i] && i < 2; i++)
+        {
+            if (!isdigit(arg[i]))
+                return false;
+        }
+        return arg[i] == 0 && i > 0;
     }
     bool is_op(char *arg)
     {
