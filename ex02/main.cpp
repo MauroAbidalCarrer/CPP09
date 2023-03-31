@@ -22,7 +22,7 @@ int main(int ac, char **av) {
         //check for duplicates
         for (size_t i = 0; i < vec.size(); i++)
         {
-            if (std::count(vec.begin(), vec.end(), vec[i]))
+            if (std::count(vec.begin(), vec.end(), vec[i]) > 1)
             {
                 std::cerr << "duplicate " << vec[i] << " in sequence" << std::endl;
                 return 1;
@@ -61,6 +61,10 @@ int main(int ac, char **av) {
         PmergeMe::merge_insert_vector<std::deque<int> >(deque);
         end_time = clock();
         std::cout << "Time to process a range of " << nb_element << " elements with std::deque sort:   " << ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000000 << " us" << std::endl;
+        // std::cout << "After: ";
+        // for (size_t i = 0; i < deque.size(); i++)
+        //     std::cout << deque[i] << " ";
+        // std::cout << std::endl;
     }
     catch(std::exception& e)
     {
