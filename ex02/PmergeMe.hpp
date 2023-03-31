@@ -38,10 +38,11 @@ class PmergeMe
     template <typename T, template < typename U, typename = std::allocator<U> > class ContainerT >
     static void merge_insert_vector(ContainerT<int>& container)
     {
-        ContainerT<Pair> pairs/*() container.size() / 2 )*/;
+        if (container.size() == 0)
+            return ;
+        ContainerT<Pair> pairs(container.size() / 2 );
         for (size_t i = 0; i * 2 < container.size(); i++)
-            pairs.push_back(Pair(std::min(container[i * 2], container[i * 2 + 1]), std::max(container[i * 2], container[i * 2 + 1])));
-            // pairs[i] = Pair(std::min(container[i * 2], container[i * 2 + 1]), std::max(container[i * 2], container[i * 2 + 1]));
+            pairs[i] = Pair(std::min(container[i * 2], container[i * 2 + 1]), std::max(container[i * 2], container[i * 2 + 1]));
         bool is_odd = container.size() % 2;
         int straggler = container[container.size() - 1];
         std::sort(pairs.begin(), pairs.end());
