@@ -1,52 +1,40 @@
 #include <iostream>
 #include <vector>
-#include <list>
+#include <deque>
 #include <algorithm>
 #include <ctime>
 #include <cstdlib>
-#include <random>       // std::default_random_engine
-#include <chrono>       // std::chrono::system_clock
+#include <deque>
 
 #include "PmergeMe.hpp"
 
-# define VEC_SIZE 75
+#define NB_ELEMENTS 1000000
 
-int main(int ac, char** av) {
-    // if (ac <= 1) 
-    // {
-    //     cerr << "Error: ac < 2." << endl;
-    //     return 1;
-    // }
+int main() {
     try
     {
-        (void)ac;
-        (void)av;
-        // std::vector<int> vec;
-        // vec.push_back(5);
-        // vec.push_back(2);
-        // vec.push_back(3);
-        // vec.push_back(1);
-        // vec.push_back(4);
-        // vec.push_back(7);
-        // vec.push_back(6);
-
-        
-
-        std::vector<int> vec(VEC_SIZE);
+        //generate containers
+        std::vector<int> vec(NB_ELEMENTS);
         for (size_t i = 0; i < vec.size(); i++)
             vec[i] = i;
-        // obtain a time-based seed:
-        unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-        std::shuffle(vec.begin(), vec.end(), std::default_random_engine(seed));
+        std::srand(std::time(NULL));
+        std::random_shuffle(vec.begin(), vec.end());
+        //copy vec deque
+        std::deque<int> deque;
+        for (size_t i = 0; i < vec.size(); i++)
+            deque.push_back(vec[i]);
+        
+        //vector testing
+        clock_t start_time = clock();
+        PmergeMe::merge_insert_vector<std::vector<int> >(vec);
+        clock_t end_time = clock();
+        std::cout << "Time to process a range of " << NB_ELEMENTS << " elements with std::vector sort: " << ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000000 << " us" << std::endl;
 
-        for(size_t i = 0; i < vec.size(); i++)
-            std::cout << vec[i] << " "/* << std::endl */;
-        std::cout << std::endl;
-        PmergeMe::merge_insert_vector(vec);
-
-        for(size_t i = 0; i < vec.size(); i++)
-            std::cout << vec[i] << " "/* << std::endl */;
-        std::cout << std::endl;
+        // deque testing
+        start_time = clock();
+        PmergeMe::merge_insert_vector<std::deque<int> >(deque);
+        end_time = clock();
+        std::cout << "Time to process a range of " << NB_ELEMENTS << " elements with std::deque sort:   " << ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000000 << " us" << std::endl;
     }
     catch(std::exception& e)
     {
