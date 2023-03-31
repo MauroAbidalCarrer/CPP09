@@ -4,76 +4,75 @@
 # include <string>
 # include <vector>
 # include <list>
+# include <algorithm>
 
 class PmergeMe
 {
     public:
     //constructors and destructors
-    PmergeMe(int ac, char **av)
-    {
-        std::vector<int> v;
-        std::list<int> l;
-        for (int i = 1; i < ac; i++) {
-            int val = atoi(av[i]);
-            if (val <= 0)
-                throw Exception("Error: Input sequence must only contain positive integers.");
-            v.push_back(val);
-            l.push_back(val);
-        }
-
-        std::cout << "Before:";
-        for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
-            std::cout << " " << *it;
-        std::cout << std::endl;
-
-        clock_t start_time = clock();
-        sort(v.begin(), v.end());
-        clock_t end_time = clock();
-        std::cout << "After:";
-        for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it)
-            std::cout << " " << *it;
-        std::cout << std::endl;
-        std::cout << "Time to process a range of " << v.size() << " elements with vector sort: " << ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000000 << " us" << std::endl;
-
-        start_time = clock();
-        l.sort();
-        end_time = clock();
-        std::cout << "After:";
-        for (std::list<int>::iterator it = l.begin(); it != l.end(); ++it)
-            std::cout << " " << *it;
-        std::cout << std::endl;
-        std::cout << "Time to process a range of " << l.size() << " elements with list sort: " << ((double)(end_time - start_time) / CLOCKS_PER_SEC) * 1000000 << " us" << std::endl;
-    }
-    PmergeMe(const PmergeMe& other)
-    {
-        *this = other;
-    }
-    ~PmergeMe()
-    {
-        
-    }
+    PmergeMe(const PmergeMe& other) { *this = other; }
+    ~PmergeMe() { }
     //operator overloads
     PmergeMe& operator=(const PmergeMe& rhs)
     {
         (void)rhs;
         return *this;
     }
-    //nested classes
-    class Exception : public std::exception
+    typedef std::vector<int> int_vector_t;
+    //methods
+    static void insert_in_vec(int val, int_vector_t& vec, size_t start_index)
     {
-        private:
-        std::string errormsg;
-
-        public:
-        Exception(std::string err_msg)
+        size_t end_index = vec.size() - 1;
+        while (start_index < end_index)
         {
-            errormsg = err_msg;
+            size_t half_size =  std::max((size_t)1,  (size_t)((end_index - start_index) / 2));
+            size_t midle_index = start_index + half_size;
+            if (vec[midle_index] > val)
+                end_index = midle_index - 1;
+            else
+                start_index = midle_index;
         }
-        ~Exception() throw () {}
-
-        const char* what() const throw()
+        vec.insert(vec.begin() + start_index + 1, val);
+    }
+    static void merge_insert_vector(int_vector_t& vec)
+    {
+        std::vector<Pair> pairs(vec.size() / 2);
+        for (size_t i = 0; i * 2 < vec.size(); i++)
+            pairs[i] = Pair(std::min(vec[i * 2], vec[i * 2 + 1]), std::max(vec[i * 2], vec[i * 2 + 1]));
+        bool is_odd = vec.size() % 2;
+        int straggler = vec[vec.size() - 1];
+        std::sort(pairs.begin(), pairs.end());
+        vec.clear();
+        for (size_t i = 0; i < pairs.size(); i++)
+            vec.push_back(pairs[i].a);
+        for (size_t i = pairs.size() - 1; i >= 0; i--)
         {
-            return errormsg.c_str();
+            insert_in_vec(pairs[i].b, vec, i);
+            // std::cout << "Inserted " << pairs[i].b << ", i = " << i << std::endl;
+            if (i == 0)
+                break;
+        }
+        if (is_odd)
+            insert_in_vec(straggler, vec, 0);
+    }
+    //nested classes
+    class Pair
+    {
+        public:
+        int a;
+        int b;
+        //constructors
+        Pair() : a(0), b(0) { }
+        Pair(int a, int b) : a(a), b(b) { }
+        Pair(const Pair& other) : a(other.a), b(other.b) { }
+        ~Pair() { }
+        bool operator<(const Pair& rhs)
+        {
+            return a < rhs.a;
+        }
+        bool operator>(const Pair& rhs)
+        {
+            return a > rhs.a;
         }
     };
 };
