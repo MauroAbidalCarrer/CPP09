@@ -10,6 +10,7 @@ int main(int ac, char **av)
     try
     {
         BitcoinExchange yes("data.csv");
+
         yes.print_btc_amount_values(av[1]);
     }
     catch(std::exception e)

@@ -8,6 +8,7 @@
 # include <regex.h>
 # include <regex.h>
 # include <cstring>
+# include <iomanip>
 
 class BitcoinExchange
 {
@@ -32,6 +33,7 @@ class BitcoinExchange
             std::getline(line_stream, date_str, ',');
             line_stream >> price;
             bitcoin_prices[date_str] = price;
+            // std::cout << date_str << " | " << price << std::endl;
         }
         csv_file_stream.close();  
     }
@@ -63,7 +65,6 @@ class BitcoinExchange
             std::istringstream line_stream(line);
             std::string date_str;
             std::getline(line_stream, date_str, '|');
-            std::map<std::string, float>::const_iterator it = bitcoin_prices.lower_bound(date_str);
             float value;
             line_stream >> value;
             if (line_stream.fail() || !validate_date(date_str) || !validate_value(line))
@@ -82,9 +83,12 @@ class BitcoinExchange
                 std::cerr << "Error: too large a number." << std::endl;
                 continue;
             }
+            std::map<std::string, float>::const_iterator it = bitcoin_prices.lower_bound(date_str);
             --it;
+            // std::cout << "lowest date for " << date_str <<  " = " << it->first << ", exchange rate = " << it->second << std::endl;
             float exchange_rate = it->second;
-            std::cout << date_str << " => " << value << " = " << exchange_rate * value << std::endl;
+            float res = exchange_rate * value;
+            std::cout << date_str << " => " << value << " = " << std::setprecision(20) << res << std::endl;
         }
         input_file.close();
     }
