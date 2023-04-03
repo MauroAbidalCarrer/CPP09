@@ -4,7 +4,7 @@ int main(int ac, char **av)
 {
     if (ac < 2)
     {
-        std::cerr << "Error: could not open file." << std::endl;
+        std::cerr << "Error: no file to open specified." << std::endl;
         return 1;
     }
     try
