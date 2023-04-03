@@ -9,23 +9,25 @@
 class RPN
 {
     private:
-    std::stack<float, std::list<int> > stack;
+    std::stack<float, std::list<float> > stack;
 
     public:
     //constructors and destructors
     RPN() : stack() { }
-    RPN(char **expression) : stack()
+    RPN(const char *expression) : stack()
     {
-        for (int exp_i = 0; expression[exp_i] != NULL; exp_i++)
+        for (int exp_i = 0; expression[exp_i] != 0; exp_i++)
         {
-            char *arg = expression[exp_i];
+            char arg = expression[exp_i];
+            if (arg == ' ')
+                continue ;
             if (is_number(arg))
-                stack.push(atof(arg));
+                stack.push(arg - '0');
             else if (is_op(arg))
             {
                 float second_nb = get_last_nb();
                 float first_nb = get_last_nb();
-                switch (*arg)
+                switch (arg)
                 {
                 case '+':
                     stack.push(first_nb + second_nb);
@@ -55,32 +57,17 @@ class RPN
     //operator overloads
     RPN& operator=(const RPN& rhs)
     {
-        (void)rhs;
+        stack = rhs.stack;
         return *this;
     }
     //methods
-    void check_arg(char *arg)
+    bool is_number(char arg)
     {
-        if (is_number(arg))
-            return ;
-        if (is_op(arg))
-            return ;
-        throw RPNException();
+        return arg >= '0' && arg <= '9';
     }
-    bool is_number(char *arg)
+    bool is_op(char arg)
     {
-        arg += arg[0] == '+' || arg[0] == '-';
-        int i = 0;
-        for(; arg[i] && i < 2; i++)
-        {
-            if (!isdigit(arg[i]))
-                return false;
-        }
-        return arg[i] == 0 && i > 0;
-    }
-    bool is_op(char *arg)
-    {
-        return ((arg[0] == '+' || arg[0] == '/' || arg[0] == '*' || arg[0] == '-') && arg[1] == 0);
+        return arg == '+' || arg == '/' || arg == '*' || arg == '-';
     }
     float get_last_nb()
     {
