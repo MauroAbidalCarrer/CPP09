@@ -54,8 +54,12 @@ class BitcoinExchange
         if (!input_file.is_open())
             throw BitcoinExchangeException(std::string("Error: could not open ") + std::string(input_file_path));
         std::string line;
+        bool on_first_line = true;
         while (std::getline(input_file, line))
         {
+            if (on_first_line && line == "date | value")
+                continue;
+            on_first_line = false;
             std::istringstream line_stream(line);
             std::string date_str;
             std::getline(line_stream, date_str, '|');
@@ -64,7 +68,7 @@ class BitcoinExchange
             line_stream >> value;
             if (line_stream.fail() || !validate_date(date_str) || !validate_value(line))
             {
-                std::cerr << "Error: bad input => " << line << std::endl;
+                std::cerr << "Error: bad input => \"" << line << "\"" << std::endl;
                 continue;
             }
             
