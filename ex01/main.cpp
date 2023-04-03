@@ -5,7 +5,6 @@ int main(int ac, char **av)
 {    
     if (ac < 2)
     {
-        std::cout << "ac = " << ac << std::endl;
         std::cout << "Error" << std::endl;
         return 1;
     }
