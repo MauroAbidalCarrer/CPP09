@@ -3,12 +3,13 @@
 # include <iostream>
 # include <string>
 # include <stack>
+# include <list>
 # include <cstdlib>
 
 class RPN
 {
     private:
-    std::stack<float> stack;
+    std::stack<float, std::list<int> > stack;
 
     public:
     //constructors and destructors
