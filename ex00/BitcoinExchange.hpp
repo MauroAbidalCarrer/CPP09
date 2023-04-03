@@ -17,115 +17,17 @@ class BitcoinExchange
 
     public:
     //constructors and destructors
-    BitcoinExchange() : bitcoin_prices() { }
-    BitcoinExchange(const char * database_file) : bitcoin_prices()
-    {
-        std::ifstream csv_file_stream(database_file);
-        // Read bitcoin prices over time from csv file
-        if (!csv_file_stream.is_open())
-            throw BitcoinExchangeException(std::string("Error: could not open ") + std::string(database_file));
-        std::string line;
-        while (std::getline(csv_file_stream, line))
-        {
-            std::istringstream line_stream(line);
-            std::string date_str;
-            float price;
-            std::getline(line_stream, date_str, ',');
-            line_stream >> price;
-            bitcoin_prices[date_str] = price;
-            // std::cout << date_str << " | " << price << std::endl;
-        }
-        csv_file_stream.close();  
-    }
-    BitcoinExchange(const BitcoinExchange& other)
-    {
-        *this = other;
-    }
-    ~BitcoinExchange() {}
+    BitcoinExchange();
+    BitcoinExchange(const char * database_file);
+    BitcoinExchange(const BitcoinExchange& other);
+    ~BitcoinExchange();
     //overloads
-    BitcoinExchange& operator=(const BitcoinExchange& rhs)
-    {
-        bitcoin_prices = rhs.bitcoin_prices;
-        return *this;
-    }
+    BitcoinExchange& operator=(const BitcoinExchange& rhs);
     
     //methods
-    void print_btc_amount_values(const char * input_file_path)
-    {
-        std::ifstream input_file(input_file_path);
-        if (!input_file.is_open())
-            throw BitcoinExchangeException(std::string("Error: could not open ") + std::string(input_file_path));
-        std::string line;
-        bool on_first_line = true;
-        while (std::getline(input_file, line))
-        {
-            if (on_first_line && line == "date | value")
-                continue;
-            on_first_line = false;
-            std::istringstream line_stream(line);
-            std::string date_str;
-            std::getline(line_stream, date_str, '|');
-            float value;
-            line_stream >> value;
-            if (line_stream.fail() || !validate_date(date_str) || !validate_value(line))
-            {
-                std::cerr << "Error: bad input => \"" << line << "\"" << std::endl;
-                continue;
-            }
-            
-            if (value < 0)
-            {
-                std::cerr << "Error: not a positive number." << std::endl;
-                continue;
-            }
-            if (value > 1000)
-            {
-                std::cerr << "Error: too large a number." << std::endl;
-                continue;
-            }
-            std::map<std::string, float>::const_iterator it = bitcoin_prices.lower_bound(date_str);
-            if (it != bitcoin_prices.begin())
-                --it;
-            // std::cout << "lowest date for " << date_str <<  " = " << it->first << ", exchange rate = " << it->second << std::endl;
-            float exchange_rate = it->second;
-            float res = exchange_rate * value;
-            std::cout << date_str << " => " << value << " = " /* << std::setprecision(20)  */<< res << std::endl;
-        }
-        input_file.close();
-    }
-    bool validate_date(std::string d)
-    {
-        
-        for (size_t i = 0; i < 4; i++)
-            if (!isdigit(d[i]))
-                return false;
-        for (size_t i = 5; i < 7; i++)
-            if (!isdigit(d[i]))
-                return false;
-        for (size_t i = 8; i < 10; i++)
-            if (!isdigit(d[i]))
-                return false;
-        return d[4] == '-' && d[7] == '-' && d[10] == ' ';
-    }
-    bool validate_value(std::string v)
-    {
-        if (v[12] != ' ')
-            return false;
-        bool there_is_already_a_dot = false;
-        for (size_t i = 13; i < 18 && i < v.length(); i++)
-        {
-            if (v[i] == '.')
-            {
-                if (there_is_already_a_dot)
-                    return false;
-                there_is_already_a_dot = true;
-                continue ;
-            }
-            if (!isdigit(v[i]))
-                return false;
-        }
-        return true;
-    }
+    void print_btc_amount_values(const char * input_file_path);
+    bool validate_date(std::string d);
+    bool validate_value(std::string v);
 
     //nested classes
     class BitcoinExchangeException : public std::exception

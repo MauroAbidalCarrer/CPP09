@@ -1,6 +1,7 @@
 NAME	:= RPN
 
-SRCS	:= main.cpp
+SRCS	:=	main.cpp\
+			RPN.cpp
 OBJS	:= $(SRCS:.cpp=.o)
 
 DEPS	=	$(OBJS:.o=.d)
